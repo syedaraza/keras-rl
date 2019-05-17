@@ -10,6 +10,12 @@ from keras.layers import Dense, Activation, Flatten, Convolution2D, Permute
 from keras.optimizers import Adam
 import keras.backend as K
 
+# To put the directory (one above) on the PYTHONPATH
+# If not using following 3 lines, then run from parent dir,
+# python -m examples.dqn_atari
+import sys, os
+sys.path.insert(0, os.path.abspath('..'))
+
 from rl.agents.dqn import DQNAgent
 from rl.policy import LinearAnnealedPolicy, BoltzmannQPolicy, EpsGreedyQPolicy
 from rl.memory import SequentialMemory
@@ -53,7 +59,7 @@ env.seed(123)
 nb_actions = env.action_space.n
 
 # Next, we build our model. We use the same model that was described by Mnih et al. (2015).
-input_shape = (WINDOW_LENGTH,) + INPUT_SHAPE
+input_shape = (WINDOW_LENGTH,) + INPUT_SHAPE                # input is four consecutive grey-scale game images
 model = Sequential()
 if K.image_dim_ordering() == 'tf':
     # (width, height, channels)
@@ -63,9 +69,9 @@ elif K.image_dim_ordering() == 'th':
     model.add(Permute((1, 2, 3), input_shape=input_shape))
 else:
     raise RuntimeError('Unknown image_dim_ordering.')
-model.add(Convolution2D(32, (8, 8), strides=(4, 4)))
+model.add(Convolution2D(32, (8, 8), strides=(4, 4)))        # params = 8224 = 8*8*32*4 + 32
 model.add(Activation('relu'))
-model.add(Convolution2D(64, (4, 4), strides=(2, 2)))
+model.add(Convolution2D(64, (4, 4), strides=(2, 2)))        # params = 32832 = 4*4*64*32 + 64
 model.add(Activation('relu'))
 model.add(Convolution2D(64, (3, 3), strides=(1, 1)))
 model.add(Activation('relu'))
